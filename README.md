@@ -69,15 +69,18 @@ uv run bot.py -t webrtc
 
 ## Deployment
 
-### Render (free tier)
-1. Connect `chandra23225/wikibot-pipecat` to a Render Web Service
-2. Root directory: `server`
-3. Build: `pip install uv && uv pip install --system "pipecat-ai[daily,google,kokoro,runner,silero,whisper]>=1.12.0" "wikipedia-api>=0.16.0" "python-dotenv"`
-4. Start: `python bot.py -t daily --host 0.0.0.0 --port $PORT`
-5. Set env vars: `GOOGLE_API_KEY`, `DAILY_API_KEY`
+The bot runs fully locally out of the box. Cloud deployment is set up and ready but not yet live.
 
-### Hugging Face Spaces (landing page)
-See `hf-space/` — a Gradio Space that creates a Daily room and links users to the bot on Render.
+### Planned: Render (free tier) + Hugging Face Spaces
+- `render.yaml` and `server/Dockerfile` are configured for a Docker deploy on Render free tier
+- `hf-space/` contains a Gradio landing page for Hugging Face Spaces that creates a Daily room and links users into the live bot
+- Requires: `GOOGLE_API_KEY` and `DAILY_API_KEY` set as environment secrets on Render
+
+**To deploy:**
+1. Connect `chandra23225/wikibot-pipecat` to a Render Web Service (Docker runtime)
+2. Set build context to `./server`, Dockerfile path to `./server/Dockerfile`
+3. Add env vars: `GOOGLE_API_KEY`, `DAILY_API_KEY`, `GOOGLE_MODEL=gemini-2.0-flash-001`
+4. Push `hf-space/` to `huggingface.co/spaces/CP12/wikibot` with `BOT_SERVER_URL` pointing to the Render URL
 
 ## Environment Variables
 
