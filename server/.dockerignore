@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+.env
+.ruff_cache
+ui_screenshot.png
+ui_dom.html
+boxes.txt
+measure.py
+scrape.py

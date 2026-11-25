@@ -12,8 +12,8 @@ WORKDIR /app
 # Install uv
 RUN pip install --no-cache-dir uv
 
-# Copy dependency spec first for layer caching
-COPY pyproject.toml .
+# Copy ALL server files into the container
+COPY . .
 
 # Install production deps
 RUN uv pip install --system \
@@ -24,10 +24,7 @@ RUN uv pip install --system \
 # Pre-download Whisper base model so first user doesn't wait
 RUN python -c "from faster_whisper import WhisperModel; WhisperModel('base', device='cpu', compute_type='int8')"
 
-# Copy bot
-COPY bot.py .
-
-# Render injects PORT env var — default 8000 fallback for local Docker runs
+# Render injects PORT env var
 EXPOSE 8000
 
 CMD ["sh", "-c", "python bot.py -t daily --host 0.0.0.0 --port ${PORT:-8000}"]

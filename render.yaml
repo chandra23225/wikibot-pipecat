@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: wikibot
+    name: wikibot-pipecat
     runtime: docker
     dockerfilePath: ./server/Dockerfile
     dockerContext: ./server
-    region: oregon
+    region: singapore
     plan: free
     envVars:
       - key: GOOGLE_API_KEY
