@@ -1,11 +1,11 @@
 services:
   - type: web
     name: wikibot
-    runtime: python
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
     region: oregon
     plan: free
-    buildCommand: pip install uv && uv pip install --system "pipecat-ai[daily,google,kokoro,runner,silero,whisper]>=1.12.0" "wikipedia-api>=0.16.0" "python-dotenv"
-    startCommand: python server/bot.py -t daily --host 0.0.0.0 --port $PORT
     envVars:
       - key: GOOGLE_API_KEY
         sync: false
