@@ -32,6 +32,7 @@ from pipecat.processors.aggregators.llm_response_universal import (
     LLMContextAggregatorPair,
     LLMUserAggregatorParams,
 )
+from pipecat.observers.user_bot_latency_observer import UserBotLatencyObserver
 from pipecat.runner.types import RunnerArguments
 from pipecat.runner.utils import create_transport
 from pipecat.services.google.llm import GoogleLLMService
@@ -147,13 +148,28 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments) -> Non
         ]
     )
 
+    latency_observer = UserBotLatencyObserver()
+
+    @latency_observer.event_handler("on_latency_measured")
+    async def on_latency_measured(observer, latency_seconds):
+        logger.info(f"[LATENCY] Voice-to-voice: {latency_seconds*1000:.0f}ms")
+
+    @latency_observer.event_handler("on_latency_breakdown")
+    async def on_latency_breakdown(observer, breakdown):
+        for line in breakdown.turn_contribution_lines():
+            logger.info(f"[LATENCY BREAKDOWN] {line}")
+
+    @latency_observer.event_handler("on_first_bot_speech_latency")
+    async def on_first_bot_speech(observer, latency_seconds):
+        logger.info(f"[LATENCY] First bot speech (connect→voice): {latency_seconds*1000:.0f}ms")
+
     worker = PipelineWorker(
         pipeline,
         params=PipelineParams(
             enable_metrics=True,
             enable_usage_metrics=True,
         ),
-        observers=[],
+        observers=[latency_observer],
     )
 
     runner = WorkerRunner(handle_sigint=runner_args.handle_sigint)
